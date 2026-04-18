@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KlassenChat – Lehrkraft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/teacher.css" />
+</head>
+<body class="teacher-body">
+
+  <div class="teacher-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span>💬</span>
+        <strong>KlassenChat</strong>
+        <em>Lehrkraft</em>
+      </div>
+
+      <div class="qr-section">
+        <p class="section-label">Schüler-Link</p>
+        <div id="qr-code"></div>
+        <code id="student-url"></code>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn pair-btn" id="pair-btn">
+          <span>🔀</span> Zufällige Paare bilden
+        </button>
+        <button class="ctrl-btn pause-btn" id="pause-btn">
+          <span>⏸</span> Chat pausieren
+        </button>
+        <button class="ctrl-btn resume-btn hidden" id="resume-btn">
+          <span>▶</span> Chat fortsetzen
+        </button>
+        <button class="ctrl-btn reset-btn" id="reset-btn">
+          <span>🗑</span> Alle Daten löschen
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="teacher-main">
+      <div class="main-header">
+        <h2>Übersicht</h2>
+        <div class="status-pill" id="status-pill">● Bereit</div>
+      </div>
+
+      <section class="panel">
+        <h3>Online <span class="count-badge" id="online-count">0</span></h3>
+        <div class="user-grid" id="user-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Aktuelle Paare <span class="count-badge" id="pair-count">0</span></h3>
+        <div class="pair-grid" id="pair-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Nachrichten (alle Chats)</h3>
+        <div class="all-messages" id="all-messages">
+          <p class="empty-hint">Noch keine Nachrichten</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-bg hidden" id="confirm-modal">
+    <div class="modal">
+      <h3>Alle Daten löschen?</h3>
+      <p>Alle Nachrichten, Nutzer und Paare werden unwiderruflich gelöscht.</p>
+      <div class="modal-btns">
+        <button class="btn-cancel" id="modal-cancel">Abbrechen</button>
+        <button class="btn-confirm" id="modal-confirm">Ja, löschen</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/avatar.js"></script>
+  <script type="module" src="js/teacher.js"></script>
+</body>
+</html>
