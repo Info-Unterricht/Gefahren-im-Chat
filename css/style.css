@@ -41,7 +41,7 @@ html, body {
   border-radius: var(--radius);
   padding: 32px 28px;
   width: 100%;
-  max-width: 420px;
+  max-width: 520px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
@@ -188,7 +188,7 @@ html, body {
 }
 
 .user-badge {
-  width: 80px; height: 80px;
+  width: 80px; height: 108px;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid var(--accent);
