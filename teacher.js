@@ -10,14 +10,13 @@ import { drawAvatarFromDataURL } from './avatar.js';
 const studentURL = window.location.origin + window.location.pathname.replace('teacher.html', 'index.html');
 document.getElementById('student-url').textContent = studentURL;
 
-new QRCode(document.getElementById('qr-code'), {
-  text:   studentURL,
-  width:  160,
-  height: 160,
-  colorDark:  '#1a1d27',
-  colorLight: '#ffffff',
-  correctLevel: QRCode.CorrectLevel.M
-});
+// QR Code via Google Charts API (kein externes JS nötig)
+const qrImg = document.createElement('img');
+qrImg.width  = 160;
+qrImg.height = 160;
+qrImg.alt    = 'QR-Code';
+qrImg.src    = `https://chart.googleapis.com/chart?cht=qr&chs=160x160&chl=${encodeURIComponent(studentURL)}&choe=UTF-8`;
+document.getElementById('qr-code').appendChild(qrImg);
 
 // ── Live user list ──
 let currentUsers = {};
