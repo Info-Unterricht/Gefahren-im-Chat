@@ -41,7 +41,7 @@ html, body {
   border-radius: var(--radius);
   padding: 32px 28px;
   width: 100%;
-  max-width: 420px;
+  max-width: 520px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
@@ -188,7 +188,7 @@ html, body {
 }
 
 .user-badge {
-  width: 80px; height: 80px;
+  width: 80px; height: 108px;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid var(--accent);
@@ -379,3 +379,45 @@ html, body {
 
 /* ── Utility ── */
 .hidden { display: none !important; }
+
+/* ── Upload-Bereich ── */
+.upload-area {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.btn-upload {
+  background: var(--surface2);
+  border: 2px dashed var(--accent);
+  border-radius: 10px;
+  color: var(--accent);
+  font-family: 'Nunito', sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-upload:hover { background: rgba(108,99,255,.12); }
+
+.btn-remove {
+  background: transparent;
+  border: 1.5px solid var(--accent2);
+  border-radius: 8px;
+  color: var(--accent2);
+  font-family: 'Nunito', sans-serif;
+  font-size: .8rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.btn-remove:hover { background: rgba(255,101,132,.1); }
+
+/* Builder ausgrauen wenn Bild hochgeladen */
+.builder-disabled {
+  opacity: .35;
+  pointer-events: none;
+  user-select: none;
+}
