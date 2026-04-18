@@ -1,217 +1,97 @@
-// ── teacher.js ── Lehrkraft-Dashboard
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>KlassenChat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
 
-import { db } from './firebase-config.js';
-import {
-  ref, set, get, remove, onValue
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { drawAvatarFromDataURL } from './avatar.js';
+  <!-- ── SCREEN 1: Profil anlegen ── -->
+  <div id="screen-profile" class="screen active">
+    <div class="profile-card">
+      <div class="logo-mark">💬</div>
+      <h1>KlassenChat</h1>
+      <p class="subtitle">Erstelle dein Profil und leg los!</p>
 
-// ── QR Code & Student URL ──
-const studentURL = window.location.origin + window.location.pathname.replace('teacher.html', 'index.html');
-document.getElementById('student-url').textContent = studentURL;
+      <div class="avatar-builder">
+        <div class="avatar-preview">
+          <canvas id="avatar-canvas" width="120" height="120"></canvas>
+        </div>
+        <div class="avatar-options">
 
-// QR-Code lokal via qrcode-generator
-function generateQRCanvas(text, size) {
-  const container = document.getElementById('qr-code');
-  container.innerHTML = '<p style="color:#8890b0;font-size:.75rem;padding:8px">Lade QR…</p>';
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
-  script.crossOrigin = 'anonymous';
-  script.onload = () => {
-    try {
-      const qr = qrcode(0, 'M');
-      qr.addData(text);
-      qr.make();
-      const moduleCount = qr.getModuleCount();
-      const canvas = document.createElement('canvas');
-      const cellSize = Math.floor(size / moduleCount);
-      canvas.width  = cellSize * moduleCount;
-      canvas.height = cellSize * moduleCount;
-      const ctx = canvas.getContext('2d');
-      for (let row = 0; row < moduleCount; row++) {
-        for (let col = 0; col < moduleCount; col++) {
-          ctx.fillStyle = qr.isDark(row, col) ? '#1a1d27' : '#ffffff';
-          ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
-        }
-      }
-      container.innerHTML = '';
-      canvas.style.borderRadius = '8px';
-      canvas.style.display = 'block';
-      container.appendChild(canvas);
-    } catch (e) {
-      container.innerHTML = `<p style="color:#ff6584;font-size:.7rem;word-break:break-all">${text}</p>`;
-    }
-  };
-  script.onerror = () => {
-    container.innerHTML = `<p style="color:#ff6584;font-size:.7rem;word-break:break-all">${text}</p>`;
-  };
-  document.head.appendChild(script);
-}
+          <div class="upload-area">
+            <input type="file" id="avatar-upload" accept="image/*" style="display:none" />
+            <button class="btn-upload" id="upload-btn">📷 Bild hochladen</button>
+            <button class="btn-remove hidden" id="remove-img-btn">✕ Entfernen</button>
+          </div>
 
-generateQRCanvas(studentURL, 160);
+          <div id="avatar-builder-area">
+            <label class="opt-label">Hintergrund</label>
+            <div class="color-row" id="bg-colors"></div>
+            <label class="opt-label">Gesicht</label>
+            <div class="face-row" id="face-options"></div>
+            <label class="opt-label">Accessoire</label>
+            <div class="acc-row" id="acc-options"></div>
+          </div>
 
-// ── Live user list ──
-let currentUsers = {};
+        </div>
+      </div>
 
-onValue(ref(db, 'users'), snap => {
-  currentUsers = {};
-  const grid = document.getElementById('user-grid');
-  grid.innerHTML = '';
-  if (!snap.exists()) {
-    document.getElementById('online-count').textContent = '0';
-    return;
-  }
-  snap.forEach(child => { currentUsers[child.key] = child.val(); });
-  document.getElementById('online-count').textContent = Object.keys(currentUsers).length;
-  Object.entries(currentUsers).forEach(([id, u]) => {
-    const card = document.createElement('div');
-    card.className = 'user-card';
-    const c = document.createElement('canvas');
-    c.width = 32; c.height = 32;
-    drawAvatarFromDataURL(c, u.avatar);
-    card.appendChild(c);
-    card.appendChild(document.createTextNode(u.name));
-    grid.appendChild(card);
-  });
-});
+      <div class="input-group">
+        <input type="text" id="username-input" maxlength="20" placeholder="Dein Username…" autocomplete="off" />
+      </div>
 
-// ── Pairing ──
-document.getElementById('pair-btn').onclick = async () => {
-  const users = Object.entries(currentUsers);
-  if (users.length < 2) { alert('Mindestens 2 Schüler:innen müssen online sein!'); return; }
-  const shuffled = [...users].sort(() => Math.random() - .5);
-  await remove(ref(db, 'pairs'));
-  const pairs = [];
-  for (let i = 0; i + 1 < shuffled.length; i += 2) {
-    const [idA, userA] = shuffled[i];
-    const [idB, userB] = shuffled[i + 1];
-    const pairKey = [idA, idB].sort().join('_');
-    await set(ref(db, `pairs/${pairKey}`), { userA: idA, userB: idB });
-    await set(ref(db, `users/${idA}/pairedWith`), idB);
-    await set(ref(db, `users/${idB}/pairedWith`), idA);
-    pairs.push({ idA, nameA: userA.name, avatarA: userA.avatar, idB, nameB: userB.name, avatarB: userB.avatar });
-  }
-  renderPairs(pairs);
-  document.getElementById('pair-count').textContent = pairs.length;
-};
+      <button class="btn-primary" id="join-btn">Beitreten →</button>
+    </div>
+  </div>
 
-async function renderPairs(pairs) {
-  const grid = document.getElementById('pair-grid');
-  grid.innerHTML = '';
-  for (const p of pairs) {
-    const card = document.createElement('div');
-    card.className = 'pair-card';
-    const cA = document.createElement('canvas');
-    cA.width = 28; cA.height = 28;
-    await drawAvatarFromDataURL(cA, p.avatarA);
-    const cB = document.createElement('canvas');
-    cB.width = 28; cB.height = 28;
-    await drawAvatarFromDataURL(cB, p.avatarB);
-    const sep = document.createElement('span');
-    sep.className = 'pair-sep';
-    sep.textContent = '↔';
-    card.append(cA, document.createTextNode(p.nameA), sep, cB, document.createTextNode(p.nameB));
-    grid.appendChild(card);
-  }
-}
+  <!-- ── SCREEN 2: Warteraum ── -->
+  <div id="screen-waiting" class="screen">
+    <div class="waiting-card">
+      <div class="user-badge" id="waiting-badge"></div>
+      <h2 id="waiting-name"></h2>
+      <div class="waiting-animation">
+        <span></span><span></span><span></span>
+      </div>
+      <p class="waiting-text">Warte auf die Lehrkraft…</p>
+      <div class="online-list">
+        <p class="online-label">Online in diesem Raum:</p>
+        <div id="online-users"></div>
+      </div>
+    </div>
+  </div>
 
-onValue(ref(db, 'pairs'), async snap => {
-  if (!snap.exists()) {
-    document.getElementById('pair-count').textContent = '0';
-    document.getElementById('pair-grid').innerHTML = '';
-    return;
-  }
-  const pairs = [];
-  for (const child of Object.values(snap.val())) {
-    const [uA, uB] = await Promise.all([
-      get(ref(db, `users/${child.userA}`)),
-      get(ref(db, `users/${child.userB}`))
-    ]);
-    if (uA.exists() && uB.exists()) {
-      pairs.push({
-        idA: child.userA, nameA: uA.val().name, avatarA: uA.val().avatar,
-        idB: child.userB, nameB: uB.val().name, avatarB: uB.val().avatar
-      });
-    }
-  }
-  document.getElementById('pair-count').textContent = pairs.length;
-  renderPairs(pairs);
-});
+  <!-- ── SCREEN 3: Chat ── -->
+  <div id="screen-chat" class="screen">
+    <div class="chat-header">
+      <div class="chat-partner-info">
+        <canvas id="partner-canvas" width="40" height="40"></canvas>
+        <span id="partner-name">Partner</span>
+      </div>
+      <div class="session-badge" id="session-badge">● Live</div>
+    </div>
 
-// ── Pause / Resume ──
-let paused = false;
+    <div class="chat-paused-overlay" id="paused-overlay">
+      <div class="paused-box">
+        <span>⏸</span>
+        <p>Chat pausiert</p>
+        <small>Warte auf die Lehrkraft</small>
+      </div>
+    </div>
 
-onValue(ref(db, 'session/paused'), snap => {
-  paused = snap.val() === true;
-  updatePauseUI();
-});
+    <div id="messages" class="messages"></div>
 
-function updatePauseUI() {
-  const pauseBtn  = document.getElementById('pause-btn');
-  const resumeBtn = document.getElementById('resume-btn');
-  const pill = document.getElementById('status-pill');
-  if (paused) {
-    pauseBtn.classList.add('hidden');
-    resumeBtn.classList.remove('hidden');
-    pill.textContent = '⏸ Pausiert';
-    pill.classList.add('paused');
-  } else {
-    pauseBtn.classList.remove('hidden');
-    resumeBtn.classList.add('hidden');
-    pill.textContent = '● Aktiv';
-    pill.classList.remove('paused');
-  }
-}
+    <div class="chat-input-bar" id="chat-input-bar">
+      <input type="text" id="msg-input" placeholder="Nachricht eingeben…" maxlength="300" autocomplete="off" />
+      <button id="send-btn">↑</button>
+    </div>
+  </div>
 
-document.getElementById('pause-btn').onclick  = () => set(ref(db, 'session/paused'), true);
-document.getElementById('resume-btn').onclick = () => set(ref(db, 'session/paused'), false);
-
-// ── All Messages ──
-onValue(ref(db, 'chats'), snap => {
-  const box = document.getElementById('all-messages');
-  box.innerHTML = '';
-  if (!snap.exists()) {
-    box.innerHTML = '<p class="empty-hint">Noch keine Nachrichten</p>';
-    return;
-  }
-  const allMsgs = [];
-  snap.forEach(chatSnap => {
-    const chatId = chatSnap.key;
-    if (!chatSnap.child('messages').exists()) return;
-    chatSnap.child('messages').forEach(msgSnap => {
-      allMsgs.push({ chatId, ...msgSnap.val() });
-    });
-  });
-  allMsgs.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-  allMsgs.forEach(m => {
-    const el = document.createElement('div');
-    el.className = 'teacher-msg';
-    const ids = m.chatId.split('_');
-    const pair = ids.map(id => currentUsers[id]?.name || id.slice(0,6)).join(' ↔ ');
-    el.innerHTML = `<span class="t-sender">${escapeHtml(m.senderName)}</span><span class="t-pair">${escapeHtml(pair)}</span><span class="t-text">${escapeHtml(m.text)}</span>`;
-    box.appendChild(el);
-  });
-  box.scrollTop = box.scrollHeight;
-});
-
-// ── Reset / Delete all ──
-document.getElementById('reset-btn').onclick = () => {
-  document.getElementById('confirm-modal').classList.remove('hidden');
-};
-document.getElementById('modal-cancel').onclick = () => {
-  document.getElementById('confirm-modal').classList.add('hidden');
-};
-document.getElementById('modal-confirm').onclick = async () => {
-  await Promise.all([
-    remove(ref(db, 'users')),
-    remove(ref(db, 'chats')),
-    remove(ref(db, 'pairs')),
-    remove(ref(db, 'session')),
-  ]);
-  document.getElementById('confirm-modal').classList.add('hidden');
-};
-
-// ── Helpers ──
-function escapeHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
