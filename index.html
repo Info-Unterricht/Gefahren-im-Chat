@@ -149,27 +149,24 @@
     </div>
   </div>
 
-  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, set, get, push, onValue, onDisconnect, remove, serverTimestamp }
+    import { getDatabase, ref, set, get, push, onValue, onDisconnect, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // ── HIER deine Firebase-Konfiguration eintragen ──
     const firebaseConfig = {
-      apiKey:            "DEIN_API_KEY",
-      authDomain:        "DEIN_PROJEKT.firebaseapp.com",
-      databaseURL:       "https://DEIN_PROJEKT-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId:         "DEIN_PROJEKT",
-      storageBucket:     "DEIN_PROJEKT.appspot.com",
-      messagingSenderId: "DEINE_SENDER_ID",
-      appId:             "DEINE_APP_ID"
+      apiKey:            "AIzaSyBx2TkV-c4tRMGAwDZSH4r_fHiAjnE5bEc",
+      authDomain:        "gefahren-im-chat.firebaseapp.com",
+      databaseURL:       "https://gefahren-im-chat-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:         "gefahren-im-chat",
+      storageBucket:     "gefahren-im-chat.firebasestorage.app",
+      messagingSenderId: "489217941266",
+      appId:             "1:489217941266:web:56850d4a724deb047d1dcb"
     };
 
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
 
-    // ── Avatar ──
     const BG_COLORS = ['#6c63ff','#ff6584','#43e97b','#f7b731','#4ecdc4','#ff9a3c','#a29bfe','#fd79a8','#00cec9','#e17055'];
     const FACES     = ['😊','😎','🤩','😜','🥳','😇','🤓','😈','🦊','🐼'];
     const ACCS      = ['none','🎩','👑','🎓','🌟','🔥','💎','🎯','🎮','🎵'];
@@ -215,7 +212,6 @@
 
     function renderPreview() { drawAvatar(canvas, avatarState); }
 
-    // Hintergrundfarben
     BG_COLORS.forEach((c, i) => {
       const s = document.createElement('div');
       s.className = 'color-swatch' + (i===0?' selected':'');
@@ -229,7 +225,6 @@
       document.getElementById('bg-colors').appendChild(s);
     });
 
-    // Gesichter
     FACES.forEach((f, i) => {
       const b = document.createElement('button');
       b.className = 'face-btn' + (i===0?' selected':'');
@@ -243,7 +238,6 @@
       document.getElementById('face-options').appendChild(b);
     });
 
-    // Accessoires
     ACCS.forEach((a, i) => {
       const b = document.createElement('button');
       b.className = 'acc-btn' + (i===0?' selected':'');
@@ -259,7 +253,6 @@
 
     renderPreview();
 
-    // ── Bild-Upload ──
     const uploadInput  = document.getElementById('avatar-upload');
     const uploadBtn    = document.getElementById('upload-btn');
     const removeImgBtn = document.getElementById('remove-img-btn');
@@ -277,7 +270,7 @@
           const ctx = canvas.getContext('2d');
           const size = canvas.width;
           const minDim = Math.min(img.width, img.height);
-          const sx = (img.width  - minDim) / 2;
+          const sx = (img.width - minDim) / 2;
           const sy = (img.height - minDim) / 2;
           ctx.clearRect(0, 0, size, size);
           ctx.save();
@@ -303,7 +296,6 @@
       renderPreview();
     };
 
-    // ── State ──
     let myId = null, myName = '', myAvatar = null, myPairId = null, chatId = null;
     let sessionPaused = false;
 
@@ -312,7 +304,6 @@
       document.getElementById('screen-' + name).classList.add('active');
     }
 
-    // ── Beitreten ──
     document.getElementById('join-btn').onclick = async () => {
       const nameInput = document.getElementById('username-input');
       myName = nameInput.value.trim();
@@ -334,7 +325,6 @@
 
       showScreen('waiting');
 
-      // Warteraum-Badge
       document.getElementById('waiting-name').textContent = myName;
       const badge = document.getElementById('waiting-badge');
       badge.innerHTML = '';
@@ -343,7 +333,6 @@
       await drawFromDataURL(bc, myAvatar);
       badge.appendChild(bc);
 
-      // Online-Liste
       onValue(ref(db, 'users'), snap => {
         const list = document.getElementById('online-users');
         list.innerHTML = '';
@@ -361,22 +350,18 @@
         });
       });
 
-      // Auf Paarung warten
       onValue(ref(db, `users/${myId}/pairedWith`), async snap => {
         if (!snap.exists()) return;
         myPairId = snap.val();
         const pairSnap = await get(ref(db, `users/${myPairId}`));
         if (!pairSnap.exists()) return;
         const partner = pairSnap.val();
-
         const pc = document.getElementById('partner-canvas');
         await drawFromDataURL(pc, partner.avatar);
         document.getElementById('partner-name').textContent = partner.name;
-
         chatId = [myId, myPairId].sort().join('_');
         showScreen('chat');
 
-        // Nachrichten
         onValue(ref(db, `chats/${chatId}/messages`), snap => {
           const box = document.getElementById('messages');
           box.innerHTML = '';
@@ -392,23 +377,21 @@
         });
       });
 
-      // Session-Status
       onValue(ref(db, 'session/paused'), snap => {
         sessionPaused = snap.val() === true;
         document.getElementById('paused-overlay').classList.toggle('active', sessionPaused);
-        document.getElementById('msg-input').disabled   = sessionPaused;
-        document.getElementById('send-btn').disabled    = sessionPaused;
-        const badge = document.getElementById('session-badge');
-        badge.textContent = sessionPaused ? '⏸ Pausiert' : '● Live';
-        badge.classList.toggle('paused', sessionPaused);
+        document.getElementById('msg-input').disabled = sessionPaused;
+        document.getElementById('send-btn').disabled  = sessionPaused;
+        const b = document.getElementById('session-badge');
+        b.textContent = sessionPaused ? '⏸ Pausiert' : '● Live';
+        b.classList.toggle('paused', sessionPaused);
       });
     };
 
-    // ── Nachricht senden ──
     async function sendMessage() {
       if (sessionPaused || !chatId) return;
       const input = document.getElementById('msg-input');
-      const text  = input.value.trim();
+      const text = input.value.trim();
       if (!text) return;
       input.value = '';
       await push(ref(db, `chats/${chatId}/messages`), {
