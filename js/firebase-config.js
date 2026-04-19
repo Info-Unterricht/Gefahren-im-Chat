@@ -12,13 +12,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey:            "DEIN_API_KEY",
-  authDomain:        "DEIN_PROJEKT.firebaseapp.com",
-  databaseURL:       "https://DEIN_PROJEKT-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "DEIN_PROJEKT",
-  storageBucket:     "DEIN_PROJEKT.appspot.com",
-  messagingSenderId: "DEINE_SENDER_ID",
-  appId:             "DEINE_APP_ID"
+  apiKey: "AIzaSyBx2TkV-c4tRMGAwDZSH4r_fHiAjnE5bEc",
+  authDomain: "gefahren-im-chat.firebaseapp.com",
+  databaseURL: "https://gefahren-im-chat-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "gefahren-im-chat",
+  storageBucket: "gefahren-im-chat.firebasestorage.app",
+  messagingSenderId: "489217941266",
+  appId: "1:489217941266:web:56850d4a724deb047d1dcb"
 };
 
 // Firebase Realtime Database Regeln (im Firebase-Console einstellen):
