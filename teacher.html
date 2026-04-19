@@ -6,59 +6,95 @@
   <title>KlassenChat – Lehrkraft</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/teacher.css" />
+  <style>
+    :root {
+      --bg:#0f1117; --surface:#1a1d27; --surface2:#22263a;
+      --accent:#6c63ff; --accent2:#ff6584; --accent3:#43e97b;
+      --text:#f0f0f8; --text-muted:#8890b0; --border:#2e3350;
+      --radius:18px; --shadow:0 8px 32px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+    .hidden{display:none!important}
+    .teacher-shell{display:flex;height:100vh}
+    .sidebar{width:260px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:20px;padding:20px 16px;overflow-y:auto}
+    .sidebar-logo{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+    .sidebar-logo span{font-size:2rem}
+    .sidebar-logo strong{font-size:1.1rem;font-weight:800}
+    .sidebar-logo em{font-style:normal;font-size:.72rem;background:var(--accent);color:#fff;padding:1px 8px;border-radius:20px;font-weight:700}
+    .section-label{font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+    .qr-section{display:flex;flex-direction:column;align-items:center;gap:8px}
+    #qr-code{background:#fff;padding:10px;border-radius:12px}
+    #qr-code canvas{display:block}
+    #student-url{font-size:.62rem;color:var(--text-muted);word-break:break-all;text-align:center;font-family:'Space Mono',monospace}
+    .controls{display:flex;flex-direction:column;gap:8px}
+    .ctrl-btn{display:flex;align-items:center;gap:8px;padding:11px 13px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:opacity .2s,transform .15s}
+    .ctrl-btn:hover{opacity:.88;transform:translateY(-1px)}
+    .pair-btn{background:linear-gradient(135deg,var(--accent),#9f6eff);color:#fff}
+    .pause-btn{background:var(--surface2);color:var(--accent2);border:2px solid var(--accent2)}
+    .resume-btn{background:var(--surface2);color:var(--accent3);border:2px solid var(--accent3)}
+    .reset-btn{background:var(--surface2);color:#ff4d6d;border:2px solid #ff4d6d}
+    .teacher-main{flex:1;overflow-y:auto;padding:22px 26px;display:flex;flex-direction:column;gap:20px}
+    .main-header{display:flex;align-items:center;justify-content:space-between}
+    .main-header h2{font-size:1.4rem;font-weight:800}
+    .status-pill{font-size:.75rem;font-weight:700;font-family:'Space Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:4px 12px;border-radius:20px;color:var(--accent3)}
+    .status-pill.paused{color:var(--accent2)}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+    .panel h3{font-size:1rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .count-badge{background:var(--accent);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:20px;font-family:'Space Mono',monospace}
+    .user-grid,.pair-grid{display:flex;flex-wrap:wrap;gap:10px}
+    .user-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:9px 13px;display:flex;align-items:center;gap:9px;font-size:.88rem;font-weight:600}
+    .user-card canvas{border-radius:50%;border:2px solid var(--accent)}
+    .pair-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:9px;font-size:.88rem;font-weight:600}
+    .pair-sep{color:var(--accent2)}
+    .all-messages{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
+    .teacher-msg{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:7px 11px;font-size:.84rem}
+    .t-sender{font-weight:700;color:var(--accent);margin-right:4px}
+    .t-pair{font-size:.7rem;color:var(--text-muted);margin-left:6px;font-family:'Space Mono',monospace}
+    .empty-hint{color:var(--text-muted);font-size:.88rem;text-align:center;padding:14px 0}
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:340px;width:90%;display:flex;flex-direction:column;gap:11px;box-shadow:var(--shadow)}
+    .modal h3{font-size:1.1rem;font-weight:800}
+    .modal p{color:var(--text-muted);font-size:.88rem}
+    .modal-btns{display:flex;gap:10px;margin-top:6px}
+    .btn-cancel,.btn-confirm{flex:1;padding:11px;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:700;cursor:pointer;border:none}
+    .btn-cancel{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+    .btn-confirm{background:#ff4d6d;color:#fff}
+  </style>
 </head>
-<body class="teacher-body">
-
+<body>
   <div class="teacher-shell">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
         <span>💬</span>
         <strong>KlassenChat</strong>
         <em>Lehrkraft</em>
       </div>
-
       <div class="qr-section">
         <p class="section-label">Schüler-Link</p>
-        <img src="QR-Code.png" width="160" height="160" alt="QR-Code" style="border-radius:12px; background:#fff; padding:10px;" />
+        <img src="QR-Code.png" width="160" height="160" alt="QR-Code" style="border-radius:12px;background:#fff;padding:10px;" />
         <code id="student-url"></code>
       </div>
-
       <div class="controls">
-        <button class="ctrl-btn pair-btn" id="pair-btn">
-          <span>🔀</span> Zufällige Paare bilden
-        </button>
-        <button class="ctrl-btn pause-btn" id="pause-btn">
-          <span>⏸</span> Chat pausieren
-        </button>
-        <button class="ctrl-btn resume-btn hidden" id="resume-btn">
-          <span>▶</span> Chat fortsetzen
-        </button>
-        <button class="ctrl-btn reset-btn" id="reset-btn">
-          <span>🗑</span> Alle Daten löschen
-        </button>
+        <button class="ctrl-btn pair-btn" id="pair-btn"><span>🔀</span> Zufällige Paare bilden</button>
+        <button class="ctrl-btn pause-btn" id="pause-btn"><span>⏸</span> Chat pausieren</button>
+        <button class="ctrl-btn resume-btn hidden" id="resume-btn"><span>▶</span> Chat fortsetzen</button>
+        <button class="ctrl-btn reset-btn" id="reset-btn"><span>🗑</span> Alle Daten löschen</button>
       </div>
     </aside>
-
-    <!-- Main -->
     <main class="teacher-main">
       <div class="main-header">
         <h2>Übersicht</h2>
         <div class="status-pill" id="status-pill">● Bereit</div>
       </div>
-
       <section class="panel">
         <h3>Online <span class="count-badge" id="online-count">0</span></h3>
         <div class="user-grid" id="user-grid"></div>
       </section>
-
       <section class="panel">
         <h3>Aktuelle Paare <span class="count-badge" id="pair-count">0</span></h3>
         <div class="pair-grid" id="pair-grid"></div>
       </section>
-
       <section class="panel">
         <h3>Nachrichten (alle Chats)</h3>
         <div class="all-messages" id="all-messages">
@@ -68,7 +104,6 @@
     </main>
   </div>
 
-  <!-- Confirm Modal -->
   <div class="modal-bg hidden" id="confirm-modal">
     <div class="modal">
       <h3>Alle Daten löschen?</h3>
@@ -80,8 +115,188 @@
     </div>
   </div>
 
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/avatar.js"></script>
-  <script type="module" src="js/teacher.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get, remove, onValue }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBx2TkV-c4tRMGAwDZSH4r_fHiAjnE5bEc",
+      authDomain:        "gefahren-im-chat.firebaseapp.com",
+      databaseURL:       "https://gefahren-im-chat-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:         "gefahren-im-chat",
+      storageBucket:     "gefahren-im-chat.firebasestorage.app",
+      messagingSenderId: "489217941266",
+      appId:             "1:489217941266:web:56850d4a724deb047d1dcb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+
+    // QR-Code & URL
+    const studentURL = window.location.origin + window.location.pathname.replace('teacher.html', 'index.html');
+    document.getElementById('student-url').textContent = studentURL;
+
+    function drawFromDataURL(cvs, dataURL) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+          const ctx = cvs.getContext('2d');
+          ctx.clearRect(0, 0, cvs.width, cvs.height);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cvs.width/2, cvs.height/2, cvs.width/2, 0, Math.PI*2);
+          ctx.clip();
+          ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+          ctx.restore();
+          resolve();
+        };
+        img.src = dataURL;
+      });
+    }
+
+    // QR-Code generieren
+    const qrScript = document.createElement('script');
+    qrScript.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
+    qrScript.onload = () => {
+      try {
+        const qr = qrcode(0, 'M');
+        qr.addData(studentURL);
+        qr.make();
+        const moduleCount = qr.getModuleCount();
+        const canvas = document.createElement('canvas');
+        const cellSize = Math.floor(160 / moduleCount);
+        canvas.width = canvas.height = cellSize * moduleCount;
+        const ctx = canvas.getContext('2d');
+        for (let r = 0; r < moduleCount; r++)
+          for (let c = 0; c < moduleCount; c++) {
+            ctx.fillStyle = qr.isDark(r, c) ? '#1a1d27' : '#ffffff';
+            ctx.fillRect(c*cellSize, r*cellSize, cellSize, cellSize);
+          }
+        const container = document.getElementById('qr-code');
+        // Falls QR-Bild vorhanden, ersetzen – sonst Canvas zeigen
+        const existingImg = container.previousElementSibling;
+        canvas.style.borderRadius = '8px';
+        canvas.style.display = 'block';
+        container.innerHTML = '';
+        container.appendChild(canvas);
+      } catch(e) {}
+    };
+    document.head.appendChild(qrScript);
+
+    // Live-Nutzerliste
+    let currentUsers = {};
+
+    onValue(ref(db, 'users'), snap => {
+      currentUsers = {};
+      const grid = document.getElementById('user-grid');
+      grid.innerHTML = '';
+      if (!snap.exists()) { document.getElementById('online-count').textContent = '0'; return; }
+      snap.forEach(child => { currentUsers[child.key] = child.val(); });
+      document.getElementById('online-count').textContent = Object.keys(currentUsers).length;
+      Object.entries(currentUsers).forEach(([id, u]) => {
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        const c = document.createElement('canvas');
+        c.width = 32; c.height = 32;
+        drawFromDataURL(c, u.avatar);
+        card.appendChild(c);
+        card.appendChild(document.createTextNode(u.name));
+        grid.appendChild(card);
+      });
+    });
+
+    // Paare bilden
+    document.getElementById('pair-btn').onclick = async () => {
+      const users = Object.entries(currentUsers);
+      if (users.length < 2) { alert('Mindestens 2 Schüler:innen müssen online sein!'); return; }
+      const shuffled = [...users].sort(() => Math.random() - .5);
+      await remove(ref(db, 'pairs'));
+      const pairs = [];
+      for (let i = 0; i + 1 < shuffled.length; i += 2) {
+        const [idA, userA] = shuffled[i];
+        const [idB, userB] = shuffled[i+1];
+        const pairKey = [idA, idB].sort().join('_');
+        await set(ref(db, `pairs/${pairKey}`), { userA: idA, userB: idB });
+        await set(ref(db, `users/${idA}/pairedWith`), idB);
+        await set(ref(db, `users/${idB}/pairedWith`), idA);
+        pairs.push({ idA, nameA: userA.name, avatarA: userA.avatar, idB, nameB: userB.name, avatarB: userB.avatar });
+      }
+      renderPairs(pairs);
+      document.getElementById('pair-count').textContent = pairs.length;
+    };
+
+    async function renderPairs(pairs) {
+      const grid = document.getElementById('pair-grid');
+      grid.innerHTML = '';
+      for (const p of pairs) {
+        const card = document.createElement('div');
+        card.className = 'pair-card';
+        const cA = document.createElement('canvas'); cA.width = 28; cA.height = 28;
+        await drawFromDataURL(cA, p.avatarA);
+        const cB = document.createElement('canvas'); cB.width = 28; cB.height = 28;
+        await drawFromDataURL(cB, p.avatarB);
+        const sep = document.createElement('span'); sep.className = 'pair-sep'; sep.textContent = '↔';
+        card.append(cA, document.createTextNode(p.nameA), sep, cB, document.createTextNode(p.nameB));
+        grid.appendChild(card);
+      }
+    }
+
+    onValue(ref(db, 'pairs'), async snap => {
+      if (!snap.exists()) { document.getElementById('pair-count').textContent = '0'; document.getElementById('pair-grid').innerHTML = ''; return; }
+      const pairs = [];
+      for (const child of Object.values(snap.val())) {
+        const [uA, uB] = await Promise.all([get(ref(db, `users/${child.userA}`)), get(ref(db, `users/${child.userB}`))]);
+        if (uA.exists() && uB.exists())
+          pairs.push({ idA: child.userA, nameA: uA.val().name, avatarA: uA.val().avatar, idB: child.userB, nameB: uB.val().name, avatarB: uB.val().avatar });
+      }
+      document.getElementById('pair-count').textContent = pairs.length;
+      renderPairs(pairs);
+    });
+
+    // Pause / Resume
+    let paused = false;
+    onValue(ref(db, 'session/paused'), snap => {
+      paused = snap.val() === true;
+      document.getElementById('pause-btn').classList.toggle('hidden', paused);
+      document.getElementById('resume-btn').classList.toggle('hidden', !paused);
+      const pill = document.getElementById('status-pill');
+      pill.textContent = paused ? '⏸ Pausiert' : '● Aktiv';
+      pill.classList.toggle('paused', paused);
+    });
+    document.getElementById('pause-btn').onclick  = () => set(ref(db, 'session/paused'), true);
+    document.getElementById('resume-btn').onclick = () => set(ref(db, 'session/paused'), false);
+
+    // Alle Nachrichten
+    onValue(ref(db, 'chats'), snap => {
+      const box = document.getElementById('all-messages');
+      box.innerHTML = '';
+      if (!snap.exists()) { box.innerHTML = '<p class="empty-hint">Noch keine Nachrichten</p>'; return; }
+      const allMsgs = [];
+      snap.forEach(chatSnap => {
+        if (!chatSnap.child('messages').exists()) return;
+        chatSnap.child('messages').forEach(m => allMsgs.push({ chatId: chatSnap.key, ...m.val() }));
+      });
+      allMsgs.sort((a,b) => (a.ts||0)-(b.ts||0));
+      allMsgs.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'teacher-msg';
+        const pair = m.chatId.split('_').map(id => currentUsers[id]?.name || id.slice(0,6)).join(' ↔ ');
+        el.innerHTML = `<span class="t-sender">${esc(m.senderName)}</span><span class="t-pair">${esc(pair)}</span> <span>${esc(m.text)}</span>`;
+        box.appendChild(el);
+      });
+      box.scrollTop = box.scrollHeight;
+    });
+
+    // Reset
+    document.getElementById('reset-btn').onclick = () => document.getElementById('confirm-modal').classList.remove('hidden');
+    document.getElementById('modal-cancel').onclick = () => document.getElementById('confirm-modal').classList.add('hidden');
+    document.getElementById('modal-confirm').onclick = async () => {
+      await Promise.all([remove(ref(db,'users')), remove(ref(db,'chats')), remove(ref(db,'pairs')), remove(ref(db,'session'))]);
+      document.getElementById('confirm-modal').classList.add('hidden');
+    };
+
+    function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  </script>
 </body>
 </html>
